@@ -1,16 +1,15 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apple Calculator PRO</title>
+    <title>Калькулятор Apple</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
         }
 
         body {
@@ -18,185 +17,204 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: #1c1c1c;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
 
         .calculator {
             background: #000;
-            border-radius: 40px;
+            border-radius: 50px;
             padding: 30px;
-            /* Увеличенный размер для ПК */
-            width: 450px; 
-            box-shadow: 0 40px 100px rgba(0,0,0,0.7);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+            width: 480px;
         }
 
         .display {
+            background: #000;
             color: #fff;
-            font-size: 90px;
+            font-size: 96px;
             font-weight: 300;
             text-align: right;
-            padding: 30px 15px;
+            padding: 40px 30px;
+            margin-bottom: 20px;
             min-height: 160px;
             display: flex;
             align-items: flex-end;
             justify-content: flex-end;
             overflow: hidden;
-            word-break: break-all;
+            word-wrap: break-word;
         }
 
         .buttons {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
+            grid-template-columns: repeat(4, 100px);
+            gap: 16px;
+            justify-content: center;
         }
 
         button {
             border: none;
             border-radius: 50%;
-            font-size: 36px;
-            font-weight: 400;
+            font-size: 42px;
+            font-weight: 300;
             cursor: pointer;
-            width: 85px;
-            height: 85px;
+            transition: all 0.1s;
+            width: 100px;
+            height: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.1s ease;
-        }
-
-        /* Эффект наведения для ПК */
-        button:hover {
-            filter: brightness(1.3);
         }
 
         button:active {
-            transform: scale(0.92);
+            transform: scale(0.95);
+            filter: brightness(0.9);
         }
 
-        .gray { background: #a5a5a5; color: #000; }
-        .orange { background: #ff9f0a; color: #fff; font-size: 42px; }
-        .dark { background: #333333; color: #fff; }
+        .gray {
+            background: #a5a5a5;
+            color: #000;
+            font-weight: 400;
+        }
 
-        /* Кнопка 0 теперь занимает 1 колонку, чтобы освободить место для Backspace */
+        .orange {
+            background: #ff9f0a;
+            color: #fff;
+            font-size: 48px;
+        }
+
+        .dark {
+            background: #333;
+            color: #fff;
+        }
+
         .zero {
-            /* Если хотите вернуть длинный ноль, напишите, 
-               но сейчас мы добавили новую кнопку в ряд */
+            grid-column: span 2;
+            width: 216px;
+            border-radius: 50px;
+            justify-content: flex-start;
+            padding-left: 38px;
         }
-
-        .backspace {
-            font-size: 30px;
-            background: #333333;
-            color: #ff9f0a; /* Выделим цветом для удобства */
-        }
-
     </style>
 </head>
 <body>
     <div class="calculator">
         <div class="display" id="display">0</div>
         <div class="buttons">
-            <button class="gray" onclick="press('AC')">AC</button>
-            <button class="gray" onclick="press('toggle')">+/−</button>
-            <button class="gray" onclick="press('percent')">%</button>
-            <button class="orange" onclick="press('/')">÷</button>
+            <button class="gray" onclick="clearDisplay()">AC</button>
+            <button class="gray" onclick="toggleSign()">+/−</button>
+            <button class="gray" onclick="percentage()">%</button>
+            <button class="orange" onclick="setOperation('÷')">÷</button>
             
-            <button class="dark" onclick="press('7')">7</button>
-            <button class="dark" onclick="press('8')">8</button>
-            <button class="dark" onclick="press('9')">9</button>
-            <button class="orange" onclick="press('*')">×</button>
+            <button class="dark" onclick="appendNumber('7')">7</button>
+            <button class="dark" onclick="appendNumber('8')">8</button>
+            <button class="dark" onclick="appendNumber('9')">9</button>
+            <button class="orange" onclick="setOperation('×')">×</button>
             
-            <button class="dark" onclick="press('4')">4</button>
-            <button class="dark" onclick="press('5')">5</button>
-            <button class="dark" onclick="press('6')">6</button>
-            <button class="orange" onclick="press('-')">−</button>
+            <button class="dark" onclick="appendNumber('4')">4</button>
+            <button class="dark" onclick="appendNumber('5')">5</button>
+            <button class="dark" onclick="appendNumber('6')">6</button>
+            <button class="orange" onclick="setOperation('−')">−</button>
             
-            <button class="dark" onclick="press('1')">1</button>
-            <button class="dark" onclick="press('2')">2</button>
-            <button class="dark" onclick="press('3')">3</button>
-            <button class="orange" onclick="press('+')">+</button>
+            <button class="dark" onclick="appendNumber('1')">1</button>
+            <button class="dark" onclick="appendNumber('2')">2</button>
+            <button class="dark" onclick="appendNumber('3')">3</button>
+            <button class="orange" onclick="setOperation('+')">+</button>
             
-            <button class="dark" onclick="press('0')">0</button>
-            <button class="dark" onclick="press('.')">,</button>
-            <button class="dark backspace" onclick="press('DEL')">⌫</button>
-            <button class="orange" onclick="press('=')">=</button>
+            <button class="dark zero" onclick="appendNumber('0')">0</button>
+            <button class="dark" onclick="appendNumber('.')">,</button>
+            <button class="orange" onclick="calculate()">=</button>
         </div>
     </div>
 
     <script>
-        let current = '0';
-        let prev = null;
-        let op = null;
-        let reset = false;
+        let currentValue = '0';
+        let previousValue = null;
+        let operation = null;
+        let shouldResetDisplay = false;
 
-        // Поддержка клавиатуры
-        document.addEventListener('keydown', (e) => {
-            if (/[0-9]/.test(e.key)) press(e.key);
-            if (e.key === '.' || e.key === ',') press('.');
-            if (e.key === '+') press('+');
-            if (e.key === '-') press('-');
-            if (e.key === '*') press('*');
-            if (e.key === '/') press('/');
-            if (e.key === 'Enter' || e.key === '=') press('=');
-            if (e.key === 'Escape') press('AC');
-            if (e.key === 'Backspace') press('DEL');
-        });
+        const display = document.getElementById('display');
 
-        function press(key) {
-            if ("vibrate" in navigator) navigator.vibrate(10);
-            const display = document.getElementById('display');
+        function updateDisplay() {
+            display.textContent = currentValue;
+        }
 
-            if (!isNaN(key) || key === '.') {
-                if (reset) { current = '0'; reset = false; }
-                if (key === '.' && current.includes('.')) return;
-                current = current === '0' && key !== '.' ? key : current + key;
-            } 
-            else if (key === 'AC') {
-                current = '0'; prev = null; op = null;
-            } 
-            else if (key === 'DEL') {
-                // Логика удаления последней цифры
-                if (current.length > 1) {
-                    current = current.slice(0, -1);
-                } else {
-                    current = '0';
-                }
+        function clearDisplay() {
+            currentValue = '0';
+            previousValue = null;
+            operation = null;
+            shouldResetDisplay = false;
+            updateDisplay();
+        }
+
+        function appendNumber(num) {
+            if (shouldResetDisplay) {
+                currentValue = '0';
+                shouldResetDisplay = false;
             }
-            else if (key === 'toggle') {
-                current = (parseFloat(current) * -1).toString();
-            } 
-            else if (key === 'percent') {
-                current = (parseFloat(current) / 100).toString();
+
+            if (num === '.' && currentValue.includes('.')) return;
+            
+            if (currentValue === '0' && num !== '.') {
+                currentValue = num;
+            } else {
+                currentValue += num;
             }
-            else if (['+', '-', '*', '/'].includes(key)) {
-                if (op) calculate();
-                prev = current;
-                op = key;
-                reset = true;
-            } 
-            else if (key === '=') {
+            
+            updateDisplay();
+        }
+
+        function setOperation(op) {
+            if (operation !== null && !shouldResetDisplay) {
                 calculate();
-                op = null;
             }
-
-            // Обновление экрана
-            display.textContent = current.replace('.', ',');
+            previousValue = currentValue;
+            operation = op;
+            shouldResetDisplay = true;
         }
 
         function calculate() {
-            if (!op || prev === null) return;
-            const a = parseFloat(prev);
-            const b = parseFloat(current);
-            let res = 0;
-            switch(op) {
-                case '+': res = a + b; break;
-                case '-': res = a - b; break;
-                case '*': res = a * b; break;
-                case '/': res = a / b; break;
+            if (operation === null || previousValue === null) return;
+
+            const prev = parseFloat(previousValue);
+            const current = parseFloat(currentValue);
+            let result;
+
+            switch (operation) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '−':
+                    result = prev - current;
+                    break;
+                case '×':
+                    result = prev * current;
+                    break;
+                case '÷':
+                    result = prev / current;
+                    break;
+                default:
+                    return;
             }
-            current = Number(res.toPrecision(12)).toString();
-            reset = true;
+
+            currentValue = result.toString();
+            operation = null;
+            previousValue = null;
+            shouldResetDisplay = true;
+            updateDisplay();
         }
+
+        function toggleSign() {
+            currentValue = (parseFloat(currentValue) * -1).toString();
+            updateDisplay();
+        }
+
+        function percentage() {
+            currentValue = (parseFloat(currentValue) / 100).toString();
+            updateDisplay();
+        }
+
+        updateDisplay();
     </script>
 </body>
-</html>
+</html
