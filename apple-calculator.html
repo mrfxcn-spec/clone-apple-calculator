@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Калькулятор Apple</title>
+    <title>Apple Calculator</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            /* Запрещаем выделение текста и системные меню при долгом нажатии */
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
@@ -19,74 +18,74 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: #000; /* Черный фон для мобильных выглядит лучше */
+            background: #1c1c1c; /* Темный фон как на превью */
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
         .calculator {
             background: #000;
-            width: 100%;
-            max-width: 400px;
+            border-radius: 40px;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
+            width: 320px; /* Возвращаем компактный классический размер */
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
         .display {
             color: #fff;
-            font-size: clamp(60px, 20vw, 90px);
+            font-size: 80px;
             font-weight: 300;
             text-align: right;
             padding: 20px 10px;
             margin-bottom: 10px;
-            min-height: 140px;
+            min-height: 120px;
             display: flex;
             align-items: flex-end;
             justify-content: flex-end;
             overflow: hidden;
-            white-space: nowrap;
         }
 
         .buttons {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
+            gap: 12px;
         }
 
         button {
             border: none;
             border-radius: 50%;
-            font-size: clamp(28px, 8vw, 40px);
+            font-size: 32px;
             font-weight: 400;
             cursor: pointer;
-            aspect-ratio: 1 / 1;
+            width: 64px;
+            height: 64px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: filter 0.1s;
+            transition: opacity 0.1s;
         }
 
         button:active {
-            filter: brightness(1.5);
+            opacity: 0.7;
         }
 
+        /* Цвета из оригинального дизайна */
         .gray { background: #a5a5a5; color: #000; }
-        .orange { background: #ff9f0a; color: #fff; font-size: 45px; }
-        .dark { background: #333; color: #fff; }
+        .orange { background: #ff9f0a; color: #fff; font-size: 38px; }
+        .dark { background: #333333; color: #fff; }
 
         .zero {
             grid-column: span 2;
-            aspect-ratio: auto;
-            border-radius: 100px;
+            width: 140px;
+            border-radius: 40px;
             justify-content: flex-start;
-            padding-left: 20%;
+            padding-left: 25px;
         }
 
-        /* Адаптация под очень маленькие экраны */
+        /* Масштабирование для мобильных экранов */
         @media (max-width: 350px) {
-            .buttons { gap: 10px; }
-            .calculator { padding: 10px; }
+            .calculator {
+                transform: scale(0.9);
+            }
         }
     </style>
 </head>
@@ -94,125 +93,86 @@
     <div class="calculator">
         <div class="display" id="display">0</div>
         <div class="buttons">
-            <button class="gray" onclick="handleInput('AC')">AC</button>
-            <button class="gray" onclick="handleInput('toggle')">+/−</button>
-            <button class="gray" onclick="handleInput('percent')">%</button>
-            <button class="orange" onclick="handleInput('/')">÷</button>
+            <button class="gray" onclick="press('AC')">AC</button>
+            <button class="gray" onclick="press('toggle')">+/−</button>
+            <button class="gray" onclick="press('percent')">%</button>
+            <button class="orange" onclick="press('/')">÷</button>
             
-            <button class="dark" onclick="handleInput('7')">7</button>
-            <button class="dark" onclick="handleInput('8')">8</button>
-            <button class="dark" onclick="handleInput('9')">9</button>
-            <button class="orange" onclick="handleInput('*')">×</button>
+            <button class="dark" onclick="press('7')">7</button>
+            <button class="dark" onclick="press('8')">8</button>
+            <button class="dark" onclick="press('9')">9</button>
+            <button class="orange" onclick="press('*')">×</button>
             
-            <button class="dark" onclick="handleInput('4')">4</button>
-            <button class="dark" onclick="handleInput('5')">5</button>
-            <button class="dark" onclick="handleInput('6')">6</button>
-            <button class="orange" onclick="handleInput('-')">−</button>
+            <button class="dark" onclick="press('4')">4</button>
+            <button class="dark" onclick="press('5')">5</button>
+            <button class="dark" onclick="press('6')">6</button>
+            <button class="orange" onclick="press('-')">−</button>
             
-            <button class="dark" onclick="handleInput('1')">1</button>
-            <button class="dark" onclick="handleInput('2')">2</button>
-            <button class="dark" onclick="handleInput('3')">3</button>
-            <button class="orange" onclick="handleInput('+')">+</button>
+            <button class="dark" onclick="press('1')">1</button>
+            <button class="dark" onclick="press('2')">2</button>
+            <button class="dark" onclick="press('3')">3</button>
+            <button class="orange" onclick="press('+')">+</button>
             
-            <button class="dark zero" onclick="handleInput('0')">0</button>
-            <button class="dark" onclick="handleInput('.')">,</button>
-            <button class="orange" onclick="handleInput('=')">=</button>
+            <button class="dark zero" onclick="press('0')">0</button>
+            <button class="dark" onclick="press('.')">,</button>
+            <button class="orange" onclick="press('=')">=</button>
         </div>
     </div>
 
     <script>
-        let currentValue = '0';
-        let previousValue = null;
-        let operation = null;
-        let shouldResetDisplay = false;
+        let current = '0';
+        let prev = null;
+        let op = null;
+        let reset = false;
 
-        const displayElement = document.getElementById('display');
+        function press(key) {
+            // Вибрация (для Android)
+            if ("vibrate" in navigator) navigator.vibrate(10);
 
-        // Функция вибрации
-        function vibrate() {
-            if ("vibrate" in navigator) {
-                navigator.vibrate(15); // Короткая вибрация 15мс
+            const display = document.getElementById('display');
+
+            if (!isNaN(key) || key === '.') {
+                if (reset) { current = '0'; reset = false; }
+                if (key === '.' && current.includes('.')) return;
+                current = current === '0' && key !== '.' ? key : current + key;
+            } 
+            else if (key === 'AC') {
+                current = '0'; prev = null; op = null;
+            } 
+            else if (key === 'toggle') {
+                current = (parseFloat(current) * -1).toString();
+            } 
+            else if (key === 'percent') {
+                current = (parseFloat(current) / 100).toString();
             }
-        }
-
-        function updateDisplay() {
-            // Заменяем точку на запятую для локализации
-            displayElement.textContent = currentValue.replace('.', ',');
-        }
-
-        function handleInput(type) {
-            vibrate(); // Вызываем вибрацию при любом клике
-
-            if (!isNaN(type) || type === '.') {
-                appendNumber(type);
-            } else if (['+', '-', '*', '/'].includes(type)) {
-                setOperation(type);
-            } else if (type === '=') {
+            else if (['+', '-', '*', '/'].includes(key)) {
+                if (op) calculate();
+                prev = current;
+                op = key;
+                reset = true;
+            } 
+            else if (key === '=') {
                 calculate();
-            } else if (type === 'AC') {
-                clearDisplay();
-            } else if (type === 'toggle') {
-                toggleSign();
-            } else if (type === 'percent') {
-                percentage();
+                op = null;
             }
-        }
 
-        function appendNumber(num) {
-            if (shouldResetDisplay) {
-                currentValue = '0';
-                shouldResetDisplay = false;
-            }
-            if (num === '.' && currentValue.includes('.')) return;
-            if (currentValue === '0' && num !== '.') {
-                currentValue = num;
-            } else {
-                currentValue += num;
-            }
-            updateDisplay();
-        }
-
-        function setOperation(op) {
-            if (operation !== null) calculate();
-            previousValue = currentValue;
-            operation = op;
-            shouldResetDisplay = true;
+            // Обновляем текст (заменяем точку на запятую как в оригинале)
+            display.textContent = current.slice(0, 7).replace('.', ',');
         }
 
         function calculate() {
-            if (operation === null || previousValue === null) return;
-            const prev = parseFloat(previousValue);
-            const current = parseFloat(currentValue);
-            let result;
-
-            switch (operation) {
-                case '+': result = prev + current; break;
-                case '-': result = prev - current; break;
-                case '*': result = prev * current; break;
-                case '/': result = prev / current; break;
+            if (!op || prev === null) return;
+            const a = parseFloat(prev);
+            const b = parseFloat(current);
+            let res = 0;
+            switch(op) {
+                case '+': res = a + b; break;
+                case '-': res = a - b; break;
+                case '*': res = a * b; break;
+                case '/': res = a / b; break;
             }
-
-            currentValue = parseFloat(result.toFixed(8)).toString();
-            operation = null;
-            shouldResetDisplay = true;
-            updateDisplay();
-        }
-
-        function clearDisplay() {
-            currentValue = '0';
-            previousValue = null;
-            operation = null;
-            updateDisplay();
-        }
-
-        function toggleSign() {
-            currentValue = (parseFloat(currentValue) * -1).toString();
-            updateDisplay();
-        }
-
-        function percentage() {
-            currentValue = (parseFloat(currentValue) / 100).toString();
-            updateDisplay();
+            current = parseFloat(res.toFixed(8)).toString();
+            reset = true;
         }
     </script>
 </body>
